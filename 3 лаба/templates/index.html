@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+<body>
+    <h1>Добро пожаловать</h1>
+    {% if current_user.is_authenticated %}
+        <p>Вы авторизованы как {{ current_user.id }}</p>
+        <p><a href="{{ url_for('logout') }}">Logout</a></p>
+    {% else %}
+        <p><a href="{{ url_for('login') }}">Login</a></p>
+    {% endif %}
+    <p><a href="{{ url_for('secret') }}">Секретная страница</a></p>
+    <p><a href="{{ url_for('visits') }}">Счетчик посещений</a></p>
+</body>
+</html>
