@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<head>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Phone Number Validation</h1>
+        <form method="post">
+            <div class="form-group">
+                <label for="phone_number">Phone Number:</label>
+                <input type="text" class="form-control {% if error %}is-invalid{% endif %}" id="phone_number" name="phone_number" value="{{ phone_number }}">
+                {% if error %}
+                    <div class="invalid-feedback">
+                        {{ error }}
+                    </div>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn btn-primary">Check</button>
+        </form>
+    </div>
+</body>
+
+{% endblock %}

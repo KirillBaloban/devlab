@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Все запросы</title>
+</head>
+<body>
+    <h1>Все запросы</h1>
+    <ul>
+        {% for req in all_requests %}
+        <li>
+            <strong>URL:</strong> {{ req.url }}<br>
+            <strong>Method:</strong> {{ req.method }}<br>
+            <strong>Arguments:</strong> {{ req.args }}<br>
+            <strong>Form Data:</strong> {{ req.form }}<br>
+            <strong>Headers:</strong> {{ req.headers }}<br>
+            <strong>Cookies:</strong> {{ req.cookies }}
+            <hr>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
