@@ -1,0 +1,45 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+thead {
+    background-color: #f0f0f0;
+}
+
+tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+td a {
+    text-decoration: none;
+    padding: 5px 10px;
+    margin-right: 10px;
+    color: #007bff;
+}
+
+td a:hover {
+    text-decoration: underline;
+}
+
+form {
+    display: inline;
+    margin: 0;
+}
