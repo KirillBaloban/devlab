@@ -1,11 +1,11 @@
 import random
 from flask import Flask, render_template, request
 from faker import Faker
-
+from flask import make_response
 fake = Faker()
 
 app = Flask(__name__)
-all_requests = []
+'''all_requests = []'''
 
 images_ids = ['7d4e9175-95ea-4c5f-8be5-92a6b708bb3c',
               '2d2ab7df-cdbc-48a8-a936-35bba702def5',
@@ -115,7 +115,7 @@ def error_form():
         if result['success']:
             return render_template('success.html', phone_number=result['message'])
     return render_template('error_form.html', error=result['message'], phone_number=phone_number)
-
+'''
 @app.route('/all_requests')
 def show_all_requests():
     return render_template('all_requests.html', all_requests=all_requests)
@@ -132,7 +132,7 @@ def log_request_info():
         'cookies': request.cookies
     }
     all_requests.append(request_data)
-
+'''
 @app.route('/display_info', methods=['GET', 'POST'])
 def display_info():
     # Получаем параметры URL
@@ -144,12 +144,23 @@ def display_info():
     # Получаем значения из cookie
     cookies = request.cookies
 
-    # Проверяем, был ли отправлен запрос методом POST
-    form_params = None
+    # Обрабатываем установку и удаление cookie
     if request.method == 'POST':
-        form_params = request.form.to_dict()
+        cookie_name = request.form.get('cookie_name')
+        cookie_value = request.form.get('cookie_value')
 
-    return render_template('display_info.html', url_params=url_params, headers=headers, cookies=cookies, form_params=form_params)
+        if cookie_name and cookie_value:
+            response = make_response(render_template('display_info.html', url_params=url_params, headers=headers, cookies=cookies))
+            response.set_cookie(cookie_name, cookie_value)
+            return response
+
+        cookie_to_delete = request.form.get('cookie_to_delete')
+        if cookie_to_delete in cookies:
+            response = make_response(render_template('display_info.html', url_params=url_params, headers=headers, cookies=cookies))
+            response.set_cookie(cookie_to_delete, expires=0)
+            return response
+
+    return render_template('display_info.html', url_params=url_params, headers=headers, cookies=cookies)
 
 if __name__ == '__main__':
     app.run(debug=True)
