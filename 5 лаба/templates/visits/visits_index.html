@@ -1,0 +1,48 @@
+{% from 'pagination.html' import render_pagination %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Журнал посещений</title>
+</head>
+<body>
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning alert-dismissible">
+            <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            {{ message }}
+        </div>
+    {% endfor %}
+    <div class="text-center my-3">
+        <a class="btn btn-info" href="pages">Посещения по страницам</a>
+        <a class="btn btn-info" href="users">Посещения по пользователям</a>
+    </div>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Посещения пользователей</h1>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Пользователь</th>
+                    <th>Страница</th>
+                    <th>Дата</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for visit_log in visit_logs %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ visit_log.user }}</td>
+                    <td>{{ visit_log.page }}</td>
+                    <td>{{ visit_log.creation_date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="mb-5">
+            {{ render_pagination(pagination, request.endpoint) }}
+        </div>
+
+    </div>
+</body>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Посещения по пользователям</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Посещения по пользователям</h1>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>ФИО</th>
+                    <th>Кол-во посещений</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in user_visits %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ user.user }}</td>
+                    <td>{{ user.visits }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a class="btn btn-primary" href="users/export">Выгрузка посещений</a>
+    </div>
+</body>
+</html>
