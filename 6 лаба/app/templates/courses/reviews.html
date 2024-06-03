@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% from 'pagination.html' import render_pagination %}
+
+{% block content %}
+<div class="container">
+    <div class="my-5">
+        <h2 class="mb-3 text-center text-uppercase font-weight-bold">Отзывы о курсе</h2>
+
+        <form class="mb-5 mt-3 row align-items-center">
+            <div class="col-md-4 my-3">
+                <select class="form-select" id="reviews-sort" name="reviews-sort-by" title="Сортировка">
+                    <option value="">Сортировка</option>
+                        <option value="date">По дате создания</option>
+                        <option value="desc_rating">Сначала положительные</option>
+                        <option value="asc_rating">Сначала отрицательные</option>
+                </select>
+            </div>
+
+            <div class="col-md-2 my-3 align-self-end">
+                <button type="submit" class="btn btn-dark w-100 mt-auto">Применить</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="reviews-list container-fluid mt-3 mb-3">
+        {% for review in reviews %}
+            <div class="row p-3 border rounded mb-3">
+                <div class="col-md-9 align-items-center">
+                    <div class="d-flex">
+                        <h4 class="text-uppercase">{{ review.user.full_name }}</h4>
+                        <p class="ms-auto rating">
+                            <span>★</span> <span>{{ "%.2f" | format(review.rating) }}</span>
+                        </p>
+                    </div>
+                    <p class="text-muted my-3">{{ review.created_at }}</p>
+                    <p>{{ review.text }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="mb-5">
+        {{ render_pagination(pagination, request.endpoint, sort_by) }}
+    </div>
+
+    {% if current_user_review is not none %}
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Ваш отзыв о курсе</h5>
+            <p class="card-text">{{ current_user_review.text }}</p>
+            <p class="card-text">Оценка: {{ current_user_review.rating }}</p>
+            <p class="card-text"><small class="text-muted">{{ current_user_review.created_at }}</small></p>
+          </div>
+        </div>
+    {% else %}
+    <form method="POST" action="{{ url_for('courses.create_review', course_id=course.id) }}" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="rating">Оценка:</label>
+        <select class="form-control" id="rating" name="rating">
+          <option value="5" selected="selected">Отлично</option>
+          <option value="4">Хорошо</option>
+          <option value="3">Удовлетворительно</option>
+          <option value="2">Неудовлетворительно</option>
+          <option value="1">Плохо</option>
+          <option value="0">Ужасно</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="text">Отзыв:</label>
+        <textarea class="form-control" id="text" name="text" rows="3"></textarea>
+      </div>
+        <input type="submit" class="btn btn-dark" value="Сохранить">
+    </form>
+    {% endif %}
+
+</div>
+{% endblock %}
