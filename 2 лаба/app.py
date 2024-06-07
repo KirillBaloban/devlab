@@ -2,6 +2,7 @@ import random
 from flask import Flask, render_template, request
 from faker import Faker
 from flask import make_response
+from flask import request
 fake = Faker()
 
 app = Flask(__name__)
@@ -99,10 +100,6 @@ def post(index):
     )
 
 
-@app.route('/about')
-def about():
-    return render_template('about.html', title='Об авторе')
-
 
 @app.route('/error_form', methods=['GET', 'POST'])
 def error_form():
@@ -115,52 +112,36 @@ def error_form():
         if result['success']:
             return render_template('success.html', phone_number=result['message'])
     return render_template('error_form.html', error=result['message'], phone_number=phone_number)
-'''
-@app.route('/all_requests')
-def show_all_requests():
-    return render_template('all_requests.html', all_requests=all_requests)
 
-# Регистрируем обработчик для всех маршрутов
-@app.before_request
-def log_request_info():
-    request_data = {
-        'url': request.url,
-        'method': request.method,
-        'args': request.args.to_dict(),
-        'form': request.form.to_dict(),
-        'headers': dict(request.headers),
-        'cookies': request.cookies
-    }
-    all_requests.append(request_data)
-'''
-@app.route('/display_info', methods=['GET', 'POST'])
-def display_info():
-    # Получаем параметры URL
-    url_params = request.args.to_dict()
 
-    # Получаем заголовки запроса
-    headers = request.headers
-
-    # Получаем значения из cookie
+@app.route('/cookies')
+def cookies():
     cookies = request.cookies
+    if 'visited' not in cookies:
+        response = make_response(render_template('cookies.html', cookies=cookies))
+        response.set_cookie('visited', 'yes')
+        return response
+    response = make_response(render_template('cookies.html', cookies=cookies))
+    response.set_cookie('visited', expires=0)
+    
+    return response
 
-    # Обрабатываем установку и удаление cookie
+@app.route('/url_params')
+def url_params():
+    url_params = request.args
+
+    return render_template('url_params.html', url_params=url_params)
+
+@app.route('/request_headers')
+def request_headers():
+    return render_template('request_headers.html')
+
+@app.route('/form_params', methods=['GET', 'POST'])
+def form_params():
     if request.method == 'POST':
-        cookie_name = request.form.get('cookie_name')
-        cookie_value = request.form.get('cookie_value')
+        pass
 
-        if cookie_name and cookie_value:
-            response = make_response(render_template('display_info.html', url_params=url_params, headers=headers, cookies=cookies))
-            response.set_cookie(cookie_name, cookie_value)
-            return response
-
-        cookie_to_delete = request.form.get('cookie_to_delete')
-        if cookie_to_delete in cookies:
-            response = make_response(render_template('display_info.html', url_params=url_params, headers=headers, cookies=cookies))
-            response.set_cookie(cookie_to_delete, expires=0)
-            return response
-
-    return render_template('display_info.html', url_params=url_params, headers=headers, cookies=cookies)
+    return render_template('form_params.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

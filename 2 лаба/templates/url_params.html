@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Параметры URL</h1>
+    <table class="table">
+        <tbody>
+            {% for key, value in request.args.items() %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value }}</td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td>param1</td>
+                <td>{{ request.args.get('param1') }}</td>
+            </tr>
+            <tr>
+                <td>param2</td>
+                <td>{{ request.args.get('param2') }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+{% endblock %}

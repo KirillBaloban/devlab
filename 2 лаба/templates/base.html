@@ -1,66 +1,116 @@
 <!doctype html>
 <html lang="ru">
-  <head>
+<head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+ <style>
+        footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 20px;
+            font-size: 18px; 
+        }
 
+        .btn-login {
+            background-color: #007bff;
+            color: white;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            padding: 5px 15px;
+        }
+
+        .btn-logout {
+            background-color: #dc3545;
+            color: white;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            padding: 5px 15px;
+        }
+
+        .btn-nav {
+            background-color: #ffc107; 
+            color: black; 
+            margin-bottom: 5px;
+            border-radius: 5px;
+            padding: 5px 15px;
+        }
+
+        .navbar-link {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
     <title>
         {% if title %}
-          {{ title }}
+            {{ title }}
         {% else %}
-          Лабораторная работа №1
+            Лабораторная работа №2
         {% endif %}
     </title>
-  </head>
-  <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container">
-              <a class="navbar-brand" href="{{ url_for('index') }}">Лабораторная работа № 1</a>
-              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand">Лабораторная работа №2</span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
-              </button>
-              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                  <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="{{ url_for('index') }}">Задание</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="{{ url_for('posts') }}">Посты</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="{{ url_for('error_form') }}">Форма отработки ошибок</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="{{ url_for('display_info') }}">Просмотреть запросы</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('about') }}">Об авторе</a>
-                  </li>
-                  
+                    <li class="nav-item">
+                        <a class="nav-link navbar-link" href="{{ url_for('index') }}"><button class="btn btn-nav">Задание</button></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link navbar-link" href="{{ url_for('posts') }}"><button class="btn btn-nav">Посты</button></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link navbar-link" href="{{ url_for('error_form') }}"><button class="btn btn-nav">Форма отработки ошибок</button></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link navbar-link" href="{{ url_for('cookies') }}"><button class="btn btn-nav">Просмотреть запросы</button></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link navbar-link" href="{{ url_for('url_params') }}"><button class="btn btn-nav">Параметры URL</button></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link navbar-link" href="{{ url_for('request_headers') }}"><button class="btn btn-nav">Заголовки запроса</button></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link navbar-link" href="{{ url_for('form_params') }}"><button class="btn btn-nav">Параметры формы</button></a>
+                    </li>
                 </ul>
-              </div>
             </div>
-          </nav>
-    </header>
-
-    <main class="my-3">
-        <div class="container">
-            {% block content %}
-                <h1>Содержимое по умолчанию</h1>
-            {% endblock %}
         </div>
-    </main>
+    </nav>
+</header>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='main.js') }}" defer></script>
-  <footer>
+<main class="my-3">
+    <div class="container">
+        {% block content %}
+            <h1>Содержимое по умолчанию</h1>
+        {% endblock %}
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='main.js') }}" defer></script>
+<footer>
     <p>Балобан Кирилл 221-331</p>
-  </footer>
-  </body>
+</footer>
+</body>
 </html>
