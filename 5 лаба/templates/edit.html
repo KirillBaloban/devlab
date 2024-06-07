@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <title>Edit User</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}Edit User{% endblock %}
+
+{% block content %}
     <div class="container mt-5">
         <h1 class="text-center mb-4">Редактирование пользователя</h1>
         <div class="row justify-content-center">
@@ -54,5 +50,4 @@
             </div>
         </div>
     </div>
-</body>
-</html>
+{% endblock %}

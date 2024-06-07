@@ -1,13 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <title>Посещения по страницам</title>
-</head>
-<body>
-    <div class="container mt-5">
+{% extends 'base.html' %}
+
+{% block title %}Посещения по страницам{% endblock %}
+
+{% block content %}
+<div class="text-center my-3">
+    <a class="btn btn-info" href="{{ url_for('visit_logs.users') }}">Посещения по пользователям</a>
+    <a class="btn btn-info" href="{{ url_for('visit_logs.index') }}">Посещения пользователей</a>
+</div>    
+<div class="container mt-5">
         <h1 class="text-center mb-4">Посещения по страницам</h1>
         <table class="table table-bordered">
             <thead>
@@ -19,15 +19,15 @@
             </thead>
             <tbody>
                 {% for page in page_visits %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ page.page }}</td>
-                    <td>{{ page.visits }}</td>
-                </tr>
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ page.page }}</td>
+                        <td>{{ page.visits }}</td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>
+
         <a class="btn btn-primary" href="pages/export">Выгрузка посещений</a>
     </div>
-</body>
-</html>
+{% endblock %}

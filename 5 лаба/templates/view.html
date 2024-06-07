@@ -1,66 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <title>User Details</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
+{% extends "base.html" %}
 
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 50%;
-            margin: 0 auto;
-            border-collapse: collapse;
-        }
-
-        table td, table th {
-            padding: 8px;
-            border: 1px solid #dee2e6;
-        }
-
-        table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1 class="mt-4 mb-4">Пользователь</h1>
-        <table class="table table-bordered">
-            <tr>
-                <td>ID:</td>
-                <td>{{ user.id }}</td>
-            </tr>
-            <tr>
-                <td>Login:</td>
-                <td>{{ user.login }}</td>
-            </tr>
-            <tr>
-                <td>Фамилия:</td>
-                <td>{{ user.last_name }}</td>
-            </tr>
-            <tr>
-                <td>Имя:</td>
-                <td>{{ user.first_name }}</td>
-            </tr>
-            <tr>
-                <td>Отчество:</td>
-                <td>{{ user.middle_name }}</td>
-            </tr>
-            <tr>
-                <td>Роль:</td>
-                <td>{{ user.role.name }}</td>
-            </tr>
-        </table>
-    </div>
-</body>
-</html>
+{% block content %}
+    <h1 class="mt-4 mb-4">Пользователь</h1>
+    <table class="table table-bordered">
+        <tr>
+            <td>ID:</td>
+            <td>{{ user.id }}</td>
+        </tr>
+        <tr>
+            <td>Login:</td>
+            <td>{{ user.login }}</td>
+        </tr>
+        <tr>
+            <td>Фамилия:</td>
+            <td>{{ user.last_name }}</td>
+        </tr>
+        <tr>
+            <td>Имя:</td>
+            <td>{{ user.first_name }}</td>
+        </tr>
+        <tr>
+            <td>Отчество:</td>
+            <td>{{ user.middle_name }}</td>
+        </tr>
+        <tr>
+            <td>Роль:</td>
+            <td>{{ user.role.name }}</td>
+        </tr>
+    </table>
+{% endblock %}

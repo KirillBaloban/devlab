@@ -3,16 +3,16 @@ from functools import wraps
 from io import StringIO, BytesIO
 
 from flask import Blueprint, render_template, request, send_file
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 from models import db, VisitLogs
+from functions import check_rights
 
 visit_logs_bp = Blueprint(
     'visit_logs',
     __name__,
     template_folder='templates/visits'
 )
-
 
 def add_visit_log(f):
     @wraps(f)
@@ -34,10 +34,17 @@ def add_visit_log(f):
 
 
 @visit_logs_bp.route('/')
+@login_required
 def index():
-    visit_logs = db.session.query(VisitLogs).order_by(db.desc('creation_date'))
+    if current_user.role.name == 'admin':
+        visit_logs = db.session.query(VisitLogs).order_by(db.desc('creation_date'))
+    else:
+        visit_logs = db.session.query(VisitLogs).where(
+            VisitLogs.user == current_user.get_full_name()
+        ).order_by(db.desc('creation_date'))
     pagination = db.paginate(visit_logs)
     visit_logs = pagination.items
+
     return render_template(
         'visits_index.html',
         visit_logs=visit_logs,
@@ -46,6 +53,8 @@ def index():
 
 
 @visit_logs_bp.route('/pages')
+@login_required
+@check_rights
 def pages():
     page_visits = db.session.query(
         VisitLogs.page, db.func.count(VisitLogs.page).label('visits')
@@ -54,6 +63,8 @@ def pages():
 
 
 @visit_logs_bp.route('/pages/export')
+@login_required
+@check_rights
 def export_pages():
     page_visits = db.session.query(
         VisitLogs.page, db.func.count(VisitLogs.page).label('visits')
@@ -78,29 +89,23 @@ def export_pages():
 
 
 @visit_logs_bp.route('/users')
+@login_required
+@check_rights
 def users():
-    if current_user.role.name == 'admin':
-        user_visits = db.session.query(
-            VisitLogs.user, db.func.count(VisitLogs.user).label('visits')
-        ).group_by(VisitLogs.user).order_by(db.desc('visits')).all()
-    else:
-        user_visits = db.session.query(
-            VisitLogs.user, db.func.count(VisitLogs.user).label('visits')
-        ).group_by(VisitLogs.user).order_by(db.desc('visits')).filter_by(user=current_user.get_full_name())
+    user_visits = db.session.query(
+       VisitLogs.user, db.func.count(VisitLogs.user).label('visits')
+    ).group_by(VisitLogs.user).order_by(db.desc('visits')).all()
 
     return render_template('visits_users.html', user_visits=user_visits)
 
 
 @visit_logs_bp.route('/users/export')
+@login_required
+@check_rights
 def export_users():
-    if current_user.role.name == 'admin':
-        user_visits = db.session.query(
-            VisitLogs.user, db.func.count(VisitLogs.user).label('visits')
-        ).group_by(VisitLogs.user).order_by(db.desc('visits')).all()
-    else:
-        user_visits = db.session.query(
-            VisitLogs.user, db.func.count(VisitLogs.user).label('visits')
-        ).group_by(VisitLogs.user).order_by(db.desc('visits')).filter_by(user=current_user.get_full_name())
+    user_visits = db.session.query(
+        VisitLogs.user, db.func.count(VisitLogs.user).label('visits')
+    ).group_by(VisitLogs.user).order_by(db.desc('visits')).all()
 
     proxy = StringIO()
     cw = csv.writer(proxy)

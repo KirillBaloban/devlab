@@ -5,8 +5,8 @@ from flask_login import login_user, logout_user, login_required, current_user, L
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from models import db, User, Role
-from functions import is_valid_password
+from models import db, User, Role, VisitLogs
+from functions import is_valid_password, check_rights
 from constants import ACCESS_DENIED
 from visit_logs import visit_logs_bp, add_visit_log
 
@@ -53,19 +53,10 @@ def generate_defaults(db: SQLAlchemy):
         db.session.commit()
 
 
-def check_rights(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if current_user.role.name != 'admin':
-            flash(ACCESS_DENIED, 'error')
-            return redirect(url_for('index'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(user_id)
+    user = db.session.execute(db.select(User).filter_by(id=user_id)).scalar()
+    return user
 
 
 # Routes
@@ -81,7 +72,7 @@ def index():
 def view(user_id):
 
     if user_id != current_user.id and current_user.role.name != 'admin':
-        flash(ACCESS_DENIED, 'error')
+        flash(ACCESS_DENIED, 'danger')
         return redirect(url_for('index'))
 
     user = User.query.get_or_404(user_id)
@@ -91,7 +82,6 @@ def view(user_id):
 @app.route('/login', methods=['GET', 'POST'])
 @add_visit_log
 def login():
-    session.pop('_flashes', None)
     if request.method == 'POST':
         login = request.form['login']
         password = request.form['password']
@@ -99,10 +89,15 @@ def login():
         if user and check_password_hash(user.password, password):
             login_user(user)
             flash('Успешный вход', 'info')
+            endpoint = request.args.get('return_endpoint')
+            if endpoint and endpoint.startswith('edit'):
+                user_id = endpoint.replace('edit', '')
+                return redirect(url_for('edit', user_id=user_id))
             return redirect(url_for('index'))
+            
         else:
-            flash('Неправильный пароль или логин', 'error')
-            return render_template('login.html',  login=login, password=password)
+            flash('Неправильный пароль или логин', 'danger')
+            return render_template('login.html', login=login, password=password)
 
     return render_template('login.html')
 
@@ -165,7 +160,7 @@ def edit(user_id):
     session.pop('_flashes', None)
 
     if user_id != current_user.id and current_user.role.name != 'admin':
-        flash(ACCESS_DENIED, 'error')
+        flash(ACCESS_DENIED, 'danger')
         return redirect(url_for('index'))
 
     user = User.query.get_or_404(user_id)
@@ -185,12 +180,36 @@ def edit(user_id):
     roles = Role.query.all()
     return render_template('edit.html', user=user, roles=roles)
 
+    
+def add_visit_log(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user = current_user
+        if user.is_authenticated and user.role.name == 'default_user':
+            result = f(*args, **kwargs)
+            
+            user_id = user.id
+            user_visit_logs = VisitLogs.query.filter_by(user_id=user_id).all()
+            for visit_log in user_visit_logs:
+                db.session.delete(visit_log)
+            visit_log = VisitLogs(user_id=user_id, endpoint=request.endpoint)
+            db.session.add(visit_log)
+            db.session.commit()
+
+            return result
+
+        if not user.is_authenticated or user.role.name == 'default_user':
+            # Вернуть на главную страницу или другое место, если пользователь не аутентифицирован или имеет роль 'default_user'
+            return redirect(url_for('index'))
+        
+        return f(*args, **kwargs)
+    
+    return decorated_function
 
 @app.route('/change_password', methods=['GET', 'POST'])
 @login_required
 @add_visit_log
 def change_password():
-    session.pop('_flashes', None)
     if request.method == 'POST':
         old_password = request.form['old_password']
         new_password = request.form['new_password']
@@ -228,6 +247,11 @@ def delete(user_id):
     flash('Пользователь удален', 'success')
     return redirect(url_for('index'))
 
+@app.before_request
+def before_request():
+    if request.endpoint in ['edit','change_password','create'] and not current_user.is_authenticated:
+        flash('Вы должны сначала авторизоваться', 'warning')
+        return redirect(url_for('login', return_endpoint=request.endpoint+str(request.view_args.get('user_id'))))
 
 if __name__ == '__main__':
     with app.app_context():

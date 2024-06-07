@@ -1,18 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <title>Пользователи</title>
-</head>
-<body>
-    {% for message in get_flashed_messages() %}
-        <div class="alert alert-warning alert-dismissible">
-            <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-            {{ message }}
-        </div>
-    {% endfor %}
+{% extends "base.html" %}
+
+{% block content %}
+    
     <div class="container mt-5">
         <h1 class="text-center mb-4">Пользователи</h1>
         <table class="table table-bordered">
@@ -26,25 +15,25 @@
             </thead>
             <tbody>
                 {% for user in users %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ user.last_name }} {{ user.first_name }} {{ user.middle_name }}</td>
-                    <td>{{ user.role.name }}</td>
-                    <td>
-                        {% if current_user.is_authenticated %}
-                            {% if current_user.id == user.id or current_user.role.name == 'admin' %}
-                                <a class="btn btn-primary" href="{{ url_for('view', user_id=user.id) }}">Просмотр</a>
-                                <a class="btn btn-info" href="{{ url_for('edit', user_id=user.id) }}">Редактирование</a>
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ user.last_name }} {{ user.first_name }} {{ user.middle_name }}</td>
+                        <td>{{ user.role.name }}</td>
+                        <td>
+                            {% if current_user.is_authenticated %}
+                                {% if current_user.id == user.id or current_user.role.name == 'admin' %}
+                                    <a class="btn btn-primary" href="{{ url_for('view', user_id=user.id) }}">Просмотр</a>
+                                    <a class="btn btn-info" href="{{ url_for('edit', user_id=user.id) }}">Редактирование</a>
+                                {% endif %}
+                                {% if current_user.role.name == 'admin' %}
+                                    <form action="{{ url_for('delete', user_id=user.id) }}" method="post" style="display:inline;">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить пользователя {{ user.login }} ?')">Удалить пользователя</button>
+                                    </form>
+                                {% endif %}
                             {% endif %}
-                            {% if current_user.role.name == 'admin' %}
-                                <form action="{{ url_for('delete', user_id=user.id) }}" method="post" style="display:inline;">
-                                    <input type="hidden" name="_method" value="DELETE">
-                                    <button class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить пользователя {{ user.login }} ?')">Удалить пользователя</button>
-                                </form>
-                            {% endif %}
-                        {% endif %}
-                    </td>
-                </tr>
+                        </td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -54,11 +43,8 @@
                     <a class="btn btn-success mr-2" href="{{ url_for('create') }}">Создать пользователя</a>
                 {% endif %}
                 <a class="btn btn-warning mr-2" href="{{ url_for('change_password') }}">Поменять пароль</a>
-                <a class="btn btn-secondary" href="{{ url_for('logout') }}">Выход</a>
             {% else %}
-                <a class="btn btn-primary" href="{{ url_for('login') }}">Вход</a>
             {% endif %}
         </div>
     </div>
-</body>
-</html>
+{% endblock %}
