@@ -51,12 +51,10 @@ def load_user(user_id):
     return User.query.get(user_id)
 
 
-# Routes
 @app.route('/')
 def index():
-    users = User.query.all()
+    users = User.query.all() 
     return render_template('index.html', users=users)
-
 
 @app.route('/view/<int:user_id>')
 def view(user_id):
@@ -66,7 +64,6 @@ def view(user_id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    session.pop('_flashes', None)
     if request.method == 'POST':
         login = request.form['login']
         password = request.form['password']
@@ -74,13 +71,17 @@ def login():
         if user and check_password_hash(user.password, password):
             login_user(user)
             flash('Успешный вход', 'info')
+            endpoint = request.args.get('return_endpoint')
+            if endpoint and endpoint.startswith('edit'):
+                user_id = endpoint.replace('edit', '')
+                return redirect(url_for('edit', user_id=user_id))
             return redirect(url_for('index'))
+            
         else:
-            flash('Неправильный пароль или логин', 'error')
-            return render_template('login.html',  login=login, password=password)
+            flash('Неправильный пароль или логин', 'danger')
+            return render_template('login.html', login=login, password=password)
 
     return render_template('login.html')
-
 
 @app.route('/logout')
 @login_required
@@ -92,7 +93,7 @@ def logout():
 @app.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
-    session.pop('_flashes', None)
+   
     roles = Role.query.all()
     if request.method == 'POST':
         login = request.form['login']
@@ -102,16 +103,22 @@ def create():
         middle_name = request.form['middle_name']
         role_id = request.form['role_id']
 
-        if not is_valid_password(password):
-            flash('Недопустимый пароль', 'error')
-            return render_template('create.html', login=login, password=password, last_name=last_name, first_name=first_name, middle_name=middle_name, roles=roles)
 
-        if not (login and password and last_name and first_name and role_id and middle_name):
-            flash('Все поля обязательны', 'error')
-            return render_template('create.html', login=login, password=password, last_name=last_name, first_name=first_name, middle_name=middle_name, roles=roles)
+        if not (login and password and first_name and middle_name):
+            flash_message = 'Заполните обязательные поля:'
 
+            if not login:
+                flash_message += '\n Логин'
+            if not password:
+                flash_message += '\n Пароль'
+            if not first_name:
+                flash_message += '\n Имя'
+            if not middle_name:
+                flash_message += '\n Отчество'
+            flash(flash_message, 'danger')
+            return render_template('create.html', login=login, password=password, last_name=last_name, first_name=first_name, middle_name=middle_name, roles=roles)
         if User.query.filter_by(login=login).first():
-            flash('Пользователь с таким именем уже существует', 'error')
+            flash('Пользователь с таким именем уже существует', 'danger')
             return render_template('create.html', login=login, password=password, last_name=last_name, first_name=first_name, middle_name=middle_name, roles=roles)
 
         user = User(
@@ -133,7 +140,7 @@ def create():
 @app.route('/edit/<int:user_id>', methods=['GET', 'POST'])
 @login_required
 def edit(user_id):
-    session.pop('_flashes', None)
+   
     user = User.query.get_or_404(user_id)
 
     if request.method == 'POST':
@@ -154,7 +161,6 @@ def edit(user_id):
 @app.route('/change_password', methods=['GET', 'POST'])
 @login_required
 def change_password():
-    session.pop('_flashes', None)
     if request.method == 'POST':
         old_password = request.form['old_password']
         new_password = request.form['new_password']
@@ -190,6 +196,11 @@ def delete(user_id):
     flash('Пользователь удален', 'success')
     return redirect(url_for('index'))
 
+@app.before_request
+def before_request():
+    if request.endpoint in ['edit','change_password','create'] and not current_user.is_authenticated:
+        flash('Вы должны сначала авторизоваться', 'warning')
+        return redirect(url_for('login', return_endpoint=request.endpoint+str(request.view_args.get('user_id'))))
 
 if __name__ == '__main__':
     with app.app_context():
